@@ -1,4 +1,12 @@
 import redis from "./redisClient.js";
+import crypto from "crypto";
+
+const config = {
+  "/test": { window: 10000, limit: 3 },
+  "/login": { window: 10000, limit: 3 }
+};
+
+const fallback = { window: 10000, limit: 3 };
 const script = `
 local now = tonumber(ARGV[1])
 local window = tonumber(ARGV[2])
@@ -26,7 +34,8 @@ export function rateLimiter() {
   return async function (req, res, next) {
     const key = `rate:${req.ip}:${req.path}`;
     const now = Date.now();
-    const result = await redis.evalsha(sha, 1, key, now, 10000, 3, `${now}`);
+    const routeConfig = config[req.path] || fallback;
+    const result = await redis.evalsha(sha, 1, key, now, routeConfig.window, routeConfig.limit, `${now}`);
     if (result[0] === 0) {
       return res.status(429).send("Too many requests");
     }

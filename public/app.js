@@ -10,9 +10,16 @@ function print(text) {
 
 async function handleCommand(cmd) {
   const parts = cmd.split(" ");
-  if (parts[0] === "hit") {
+  const command = parts[0];
+  if (command === "hit") {
     const route = parts[1];
-    const count = Number(parts[2]);
+    const count = parseInt(parts[2]);
+    if (!route || !count) {
+      print("Usage: hit /<route> number [parallel] [delay=ms]");
+      return;
+    }
+    const isParallel = parts.includes("parallel");
+
     for (let i = 1; i <= count; i++) {
       const res = await fetch(route);
       stats.sent++;

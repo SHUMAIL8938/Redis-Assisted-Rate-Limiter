@@ -26,12 +26,18 @@ async function startServer() {
     app.get("/debug/:route", async (req, res) => {
       const key = `rl:${req.ip}:${req.params.route}`;
       const data = await redis.zrange(key, 0, -1, "WITHSCORES");
-      res.json({ key, entries: data });
+      res.json({
+        key,
+        entries: data,
+      });
     });
     app.get("/health", (req, res) => {
       res.json({ status: "ok", time: Date.now() });
     });
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+    app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
   } catch (err) {
     console.error("Failed to start server:", err);
     process.exit(1);

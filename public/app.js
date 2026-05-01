@@ -30,7 +30,7 @@ async function handleCommand(cmd) {
     const route = parts[1];
     const count = parseInt(parts[2]);
     if (!route || !count) {
-      print("Usage: hit /<route> number [parallel] [delay=ms]");
+      print("Usage: hit /route number [parallel] [delay=ms]");
       return;
     }
     const isParallel = parts.includes("parallel");
@@ -57,6 +57,11 @@ input.addEventListener("keydown", async (e) => {
   if (e.key === "Enter") {
     const cmd = input.value.trim();
     input.value = "";
+    if (!cmd) {
+      print("Type 'help' to see commands");
+      return;
+    }
+    print(`> ${cmd}`, "#00ff00");
     await handleCommand(cmd);
   }
 });

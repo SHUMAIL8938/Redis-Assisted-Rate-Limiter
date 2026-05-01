@@ -4,10 +4,25 @@ let stats = { sent: 0, allowed: 0, blocked: 0 };
 
 function print(text) {
   const line = document.createElement("div");
+  line.style.color = color;
   line.textContent = text;
   output.appendChild(line);
+  output.scrollTop = output.scrollHeight;
 }
-
+function updateStats(remaining) {
+  document.getElementById("sent").innerText = stats.sent;
+  document.getElementById("allowed").innerText = stats.allowed;
+  document.getElementById("blocked").innerText = stats.blocked;
+  document.getElementById("remaining").innerText = remaining ?? "-";
+}
+window.onload = () => {
+  print("Distributed Rate Limiter Simulator", "#00ff00");
+  print("Simulates API rate limiting using Redis + Lua\n", "#00ff00");
+  print("Type 'help' to explore commands", "#00ff00");
+  print("Try: hit /test 5", "#00ff00");
+  print("Type 'help debug' to learn about inspecting backend state", "#00ff00");
+  print("Then: debug test (see Redis data)\n", "#00ff00");
+};
 async function handleCommand(cmd) {
   const parts = cmd.split(" ");
   const command = parts[0];
@@ -24,8 +39,8 @@ async function handleCommand(cmd) {
     stats = { sent: 0, allowed: 0, blocked: 0 };
     updateStats();
     document.getElementById("progress-bar").style.width = "0%";
-    await sendRequests(route,count,{
-      parallel:isParallel,
+    await sendRequests(route, count, {
+      parallel: isParallel,
       delay,
     });
     for (let i = 1; i <= count; i++) {

@@ -19,7 +19,15 @@ async function handleCommand(cmd) {
       return;
     }
     const isParallel = parts.includes("parallel");
-
+    const delayArg = parts.find((p) => p.startsWith("delay="));
+    const delay = delayArg ? parseInt(delayArg.split("=")[1]) : 0;
+    stats = { sent: 0, allowed: 0, blocked: 0 };
+    updateStats();
+    document.getElementById("progress-bar").style.width = "0%";
+    await sendRequests(route,count,{
+      parallel:isParallel,
+      delay,
+    });
     for (let i = 1; i <= count; i++) {
       const res = await fetch(route);
       stats.sent++;

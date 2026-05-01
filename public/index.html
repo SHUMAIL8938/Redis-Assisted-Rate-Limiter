@@ -1,17 +1,62 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <title>Rate Limiter Terminal</title>
-</head>
-<body>
-  <div id="stats">
-    <p>Sent: <span id="sent">0</span></p>
-    <p>Allowed: <span id="allowed">0</span></p>
-    <p>Blocked: <span id="blocked">0</span></p>
-    <p>Remaining: <span id="remaining">-</span></p>
-  </div>
-  <div id="output"></div>
-  <input id="command" autofocus />
-  <script src="app.js"></script>
-</body>
+  <head>
+    <title>Rate Limiter Terminal</title>
+    <style>
+      body {
+        background: black;
+        color: #00ff00;
+        font-family: monospace;
+        padding: 20px;
+      }
+      #terminal {
+        max-width: 800px;
+        margin: auto;
+      }
+      #output {
+        white-space: pre-wrap;
+        margin-bottom: 10px;
+      }
+      input {
+        background: black;
+        border: none;
+        color: #00ff00;
+        outline: none;
+        width: 100%;
+        font-family: monospace;
+        font-size: 16px;
+      }
+      #stats {
+        border: 1px solid #00ff00;
+        padding: 10px;
+        margin-bottom: 10px;
+      }
+      #progress-container {
+        width: 100%;
+        height: 10px;
+        background: #222;
+      }
+      #progress-bar{
+        height: 100%;
+        width: 0%;
+        background: #00ff00;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="terminal">
+      <div id="stats">
+        <p>Sent: <span id="sent">0</span></p>
+        <p>Allowed: <span id="allowed">0</span></p>
+        <p>Blocked: <span id="blocked">0</span></p>
+        <p>Remaining: <span id="remaining">-</span></p>
+      </div>
+      <div id="progress-container">
+        <div id="progress-bar"></div>
+      </div>
+      <div id="output"></div>
+      <input id="command" autofocus />
+    </div>
+    <script src="app.js"></script>
+  </body>
 </html>

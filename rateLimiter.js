@@ -24,8 +24,50 @@ const rateLimitConfig = {
 const defaultConfig = { window: 10000, limit: 3 };
 let sha;
 export async function initRateLimiter() {
-  sha = await redis.script("LOAD", script);
+  try{
+      sha = await redis.script("LOAD", script);
+      console.log("Rate limiter script loaded");
+  }
+  catch(err){
+    console.error("Failed to load Lua")
+    throw err;
+  }
 }
+async function checkRateLimit(userId, route, window, limit) {
+  const now = Date.now();
+  const unique = `${now}:${crypto.randomUUID()}`;
+  const key = `rate:${userId}:${route}`;
+  try {
+    const result = await redis.evalsha(sha, 1, key, now, window, limit, unique);
+    const [allowedFlag, count, remaining] = result;
+    return {
+      allowed: allowedFlag === 1,
+      count,
+      remaining,
+    };
+  } catch (err) {
+      if(err.message.includes("NOSCRIPT")){
+        sha=await redis.script("LOAD",script);
+        const result= await redis.evalsha(
+          sha,
+          1,
+          key,
+          now,
+          window,
+          limit,
+          unique
+        );
+        const[allowedFlag,count,remaining]=result;
+        return{
+          allowed:allowedFlag==1,
+          count,
+          remaining
+        };
+      }
+      throw err;
+    }
+  }
+    
 export function rateLimiter() {
   return async function (req, res, next) {
     const routeConfig =
@@ -33,6 +75,7 @@ export function rateLimiter() {
         req.path.startsWith(route),
       )?.[1] || defaultConfig;
     const { window, limit } = routeConfig;
+
     const key = `rate:${req.ip}:${req.path}`;
     const now = Date.now();
     const unique = `${now}:${crypto.randomUUID()}`;
